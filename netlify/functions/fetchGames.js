@@ -1,28 +1,29 @@
 // netlify/functions/fetchGames.js
 export async function handler(event) {
   try {
-    const { league, season, from, to } = event.queryStringParameters;
+    const { league, season, date } = event.queryStringParameters;
 
-    if (!league || !season || !from || !to) {
+    if (!league || !season || !date) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Missing parameters" }),
+        body: JSON.stringify({
+          error: "Missing parameters (league, season, or date)",
+        }),
       };
     }
 
-    // 🏈 Correct endpoint for API-NFL
-    const apiUrl = `https://v1.american-football.api-sports.io/games?league=${league}&season=${season}&from=${from}&to=${to}`;
+    // 🏈 API-NFL endpoint — query by specific date
+    const apiUrl = `https://v1.american-football.api-sports.io/games?league=${league}&season=${season}&date=${date}`;
 
     const apiRes = await fetch(apiUrl, {
       headers: {
-        "x-apisports-key": process.env.API_KEY, // ✅ matches your .env + Netlify variable
+        "x-apisports-key": process.env.API_KEY, // matches your .env and Netlify variable
       },
     });
 
     const data = await apiRes.json();
 
-    // Optional: Debug log
-    console.log("📡 NFL API response keys:", Object.keys(data));
+    console.log(`📅 NFL games for ${date}:`, data.results);
 
     return {
       statusCode: 200,
@@ -36,7 +37,10 @@ export async function handler(event) {
     console.error("❌ fetchGames error:", err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Server error", details: err.message }),
+      body: JSON.stringify({
+        error: "Server error",
+        details: err.message,
+      }),
     };
   }
 }
