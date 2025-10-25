@@ -15,14 +15,13 @@ export async function handler(event) {
 
     const apiRes = await fetch(apiUrl, {
       headers: {
-        "x-apisports-key": process.env.API_SPORTS_KEY, // ✅ your key from Netlify env
+        "x-apisports-key": process.env.API_KEY, // ✅ matches your .env + Netlify variable
       },
     });
 
     const data = await apiRes.json();
 
-    // Debugging log (optional)
-    console.log("🔑 Key prefix:", process.env.API_SPORTS_KEY?.slice(0, 6));
+    // Optional: Debug log
     console.log("📡 NFL API response keys:", Object.keys(data));
 
     return {

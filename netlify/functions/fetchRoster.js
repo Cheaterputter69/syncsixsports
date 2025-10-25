@@ -1,21 +1,22 @@
 // netlify/functions/fetchRoster.js
 export async function handler(event) {
   try {
-    const { teamId, season } = event.queryStringParameters;
+    const { team, season } = event.queryStringParameters;
 
-    if (!teamId || !season) {
-      return { statusCode: 400, body: JSON.stringify({ error: "Missing teamId or season" }) };
+    if (!team || !season) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Missing parameters" }),
+      };
     }
 
-    // 🧭 Call API-Sports Football endpoint for team players
-    const apiRes = await fetch(
-      `https://v3.football.api-sports.io/players?team=${teamId}&season=${season}`,
-      {
-        headers: {
-          "x-apisports-key": process.env.API_SPORTS_KEY,
-        },
-      }
-    );
+    const apiUrl = `https://v1.american-football.api-sports.io/players?team=${team}&season=${season}`;
+
+    const apiRes = await fetch(apiUrl, {
+      headers: {
+        "x-apisports-key": process.env.API_KEY, // ✅ same here
+      },
+    });
 
     const data = await apiRes.json();
 
