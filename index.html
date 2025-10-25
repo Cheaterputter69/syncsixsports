@@ -2054,7 +2054,7 @@
       const nextDate = new Date(dateVal);
       nextDate.setDate(nextDate.getDate() + 1);
 
-const url = `/.netlify/functions/fetchGames?league=${leagueId}&season=2025&from=${prevDate.toISOString().split('T')[0]}&to=${nextDate.toISOString().split('T')[0]}`;
+const url = `/.netlify/functions/fetchGames?league=${leagueId}&season=2025&date=${dateVal}`;
 
       try {
         const res = await fetch(url);
