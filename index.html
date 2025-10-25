@@ -2212,16 +2212,20 @@ const url = `/.netlify/functions/fetchGames?league=${leagueId}&season=2025&date=
 // ============================================================
 
 // 🔹 Shared helpers
+// 🔹 Shared helpers
 async function fetchRoster(teamId) {
   if (!teamId) return [];
   try {
-    const res = await fetch(`/.netlify/functions/fetchRoster?teamId=${teamId}&season=2025`)
+    // 🏈 Correct query string — must match your fetchRoster.js parameters
+    const res = await fetch(`/.netlify/functions/fetchRoster?team=${teamId}&season=2025`);
     const data = await res.json();
     return data.response || [];
-  } catch {
+  } catch (err) {
+    console.error("❌ fetchRoster front-end error:", err);
     return [];
   }
 }
+
 
 // 🔹 Shared roster builder
 async function getRosterForGame(gameData) {
