@@ -1,0 +1,2756 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SYNC 6 Prototype</title>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background-color: #000;
+      color: #fff;
+      overflow-y: scroll;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      border-bottom: 1px solid #ff002a;
+      position: sticky;
+      top: 0;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 10;
+    }
+
+    .logo img {
+      height: 40px;
+      filter: drop-shadow(0 0 8px #ff002a);
+    }
+
+    .login-btn {
+      background: rgba(255, 0, 42, 0.15);
+      border: 1px solid #ff002a;
+      color: #ff002a;
+      border-radius: 30px;
+      padding: 8px 16px;
+      font-size: 0.9em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 6px #ff002a55;
+    }
+
+    .login-btn:hover {
+      background: #ff002a;
+      color: #fff;
+      box-shadow: 0 0 12px #ff002a;
+    }
+
+
+    .tagline {
+      text-align: center;
+      font-size: 1em;
+      color: #ff002a;
+      margin-top: 5px;
+      letter-spacing: 1px;
+    }
+
+
+    .ai-chatbox {
+      display: flex;
+      justify-content: center;
+      margin-top: 15px;
+      margin-bottom: 20px;
+    }
+
+    /* 💬 AI Input Field Container */
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid #ff002a;
+      border-radius: 40px;
+      padding: 8px 12px;
+      width: 100%;
+      max-width: 450px;
+      /* 👈 match your main content width */
+      box-shadow: 0 0 10px rgba(255, 0, 42, 0.3);
+    }
+
+    /* ✅ Responsive: scale to 90% width on small screens */
+    @media (max-width: 700px) {
+      .input-wrapper {
+        width: 90%;
+        max-width: none;
+      }
+    }
+
+    .input-wrapper input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #ff6666;
+      font-size: 0.95em;
+      font-family: 'Orbitron', sans-serif;
+      outline: none;
+      margin: 0 10px;
+      cursor: not-allowed;
+    }
+
+    .mic-icon {
+      width: 22px;
+      height: 22px;
+      filter: drop-shadow(0 0 6px #ff002a);
+      cursor: pointer;
+      transition: transform 0.2s ease, filter 0.3s ease;
+    }
+
+    .mic-icon:hover {
+      transform: scale(1.1);
+      filter: drop-shadow(0 0 12px #ff002a);
+    }
+
+    .btn-small {
+      background: linear-gradient(90deg, #ff002a, #a30018);
+      border: none;
+      border-radius: 25px;
+      padding: 8px 14px;
+      color: #fff;
+      font-weight: bold;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 0 8px #ff002a55;
+    }
+
+    .btn-small:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 12px #ff002a;
+    }
+
+
+
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(0, 0, 0, 0.95);
+      border: 1px solid #ff002a;
+      border-radius: 10px;
+      padding: 12px 18px;
+      color: #ff002a;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.9em;
+      box-shadow: 0 0 20px rgba(255, 0, 42, 0.3);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      z-index: 99999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+
+
+
+    main {
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+    }
+
+
+    .section {
+      border: 1px solid #ff002a;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 25px;
+      background: rgba(20, 0, 0, 0.3);
+      box-shadow: 0 0 10px #ff002a33;
+    }
+
+    .section h2 {
+      font-size: 1em;
+      color: #ff002a;
+      margin-top: 0;
+      text-transform: uppercase;
+    }
+
+    .btn {
+      background: linear-gradient(90deg, #ff002a, #a30018);
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      color: #fff;
+      font-weight: bold;
+      width: 100%;
+      cursor: pointer;
+      margin-top: 10px;
+      font-size: 1em;
+      box-shadow: 0 0 10px #ff002a;
+      transition: 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 15px #ff002a;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border-radius: 8px;
+      border: 1px solid #ff002a;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      font-size: 1em;
+    }
+
+    /* Fix date input width alignment */
+    input[type="date"] {
+      box-sizing: border-box;
+      width: 100%;
+      display: block;
+      margin-top: 8px;
+      border: 1px solid #ff002a;
+      border-radius: 8px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      font-size: 1em;
+    }
+
+
+    /* Numerology grid */
+    .numerology-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .num-box {
+      border: 1px solid #ff002a;
+      border-radius: 10px;
+      text-align: center;
+      padding: 12px;
+      background: rgba(255, 0, 42, 0.1);
+      box-shadow: inset 0 0 10px #ff002a33;
+      cursor: default;
+    }
+
+    .num-box span {
+      font-size: 1.5em;
+      color: #ff002a;
+      display: block;
+    }
+
+    .num-box.more {
+      cursor: pointer;
+      opacity: 0.85;
+    }
+
+    .num-box.more:hover {
+      background: rgba(255, 0, 42, 0.2);
+    }
+
+    .num-box.master {
+      color: #ffcc33;
+      border-color: #ffcc33;
+      box-shadow: 0 0 10px #ffcc33;
+    }
+
+    /* Drawer and accordion */
+    .drawer {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height .4s ease, opacity .4s ease;
+      margin-top: 10px;
+      border-top: 1px solid #ff002a33;
+      padding-top: 0;
+    }
+
+    .drawer.open {
+      max-height: 400px;
+      opacity: 1;
+      padding-top: 10px;
+    }
+
+    .drawer p {
+      margin: 6px 0;
+      font-family: monospace;
+      font-size: .9em;
+    }
+
+    .accordion {
+      margin-top: 15px;
+      border-top: 1px solid #ff002a66;
+      padding-top: 10px;
+      cursor: pointer;
+      color: #ff002a;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .accordion::after {
+      content: "▼";
+      font-size: 1em;
+      transition: .3s;
+    }
+
+    .accordion.active::after {
+      transform: rotate(180deg);
+    }
+
+    .panel {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height .4s ease, opacity .4s ease;
+    }
+
+    .panel.open {
+      max-height: 200px;
+      opacity: 1;
+      margin-top: 8px;
+    }
+
+    .panel p {
+      margin: 5px 0;
+      font-size: .9em;
+    }
+
+
+    .parameters-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .parameters-header h2 {
+      margin: 0;
+      font-size: 1em;
+      color: #ff002a;
+      text-transform: uppercase;
+    }
+
+
+
+    /* --- 🧩 Filter Sections  --- */
+    /* --- 🧩 Filter Sections  --- */
+    .filter-section {
+      margin-top: 20px;
+    }
+
+    .filter-section h3 {
+      color: #ff002a;
+      font-size: 1em;
+      margin-bottom: 8px;
+    }
+
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      background: rgba(255, 0, 42, 0.15);
+      border: 1px solid #ff002a;
+      color: #fff;
+      border-radius: 25px;
+      padding: 6px 14px;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: 0.25s;
+      box-shadow: 0 0 6px rgba(255, 0, 42, 0.25);
+    }
+
+    .pill.active {
+      background: #ff002a;
+      color: #fff;
+      box-shadow: 0 0 12px #ff002a;
+    }
+
+    .pill:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 12px #ff002a55;
+    }
+
+
+    /* --- 🧩 SYNC SIX PLAYER ACCORDIONS --- */
+
+    /* --- 🧩 SYNC SIX PLAYER ACCORDION LAYOUT --- */
+
+    /* --- 🧩 SYNC SIX PLAYER ACCORDIONS --- */
+
+    /* --- 🧩 SYNC SIX PLAYER ACCORDION LAYOUT --- */
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 0, 42, 0.3);
+      margin-bottom: 10px;
+      padding-bottom: 4px;
+    }
+
+    .results-header h2 {
+      color: #ff002a;
+      font-size: 1em;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin: 0;
+    }
+
+    .sync-score-header {
+      color: #ff002a;
+      font-size: 0.85em;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
+
+
+    .result-accordion {
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid #ff002a;
+      border-radius: 10px;
+      margin-top: 10px;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .result-accordion:hover {
+      background: rgba(255, 0, 42, 0.08);
+    }
+
+    #results {
+      max-height: calc(100vh - 280px);
+      /* keeps nav visible */
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      padding-bottom: 20px;
+    }
+
+
+    /* --- UNIFORM PLAYER ROWS --- */
+    .accordion-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      gap: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      cursor: pointer;
+      flex-wrap: nowrap;
+      /* prevents wrapping on wide names */
+      max-width: 100%;
+    }
+
+
+    /* left section */
+    .player-left {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      gap: 10px;
+      min-width: 0;
+      /* important for truncation */
+    }
+
+
+    .player-img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid #ff002a66;
+      box-shadow: 0 0 8px rgba(255, 0, 42, 0.3);
+    }
+
+    .player-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      line-height: 1.2;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
+    }
+
+
+
+    .player-info strong {
+      color: #fff;
+      font-size: 1em;
+      font-weight: 600;
+    }
+
+    .player-info span {
+      color: #aaa;
+      font-size: 0.8em;
+    }
+
+    /* right section */
+    .player-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+
+    .sync-score {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      line-height: 1.1;
+      min-width: 70px;
+    }
+
+    .sync-score .label {
+      color: #ff002a;
+      font-size: 0.7em;
+      /* slightly smaller */
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+
+    .sync-score .value {
+      color: #fff;
+      font-size: 1.1em;
+      /* smaller */
+      font-weight: 700;
+      text-shadow: 0 0 6px rgba(255, 0, 42, 0.6);
+    }
+
+
+    /* plus button */
+    .add-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .add-btn img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 0, 42, 0.18) 0%, transparent 70%);
+      filter: drop-shadow(0 0 8px #ff002a);
+      transition: transform 0.2s ease, filter 0.3s ease;
+    }
+
+    .add-btn:hover img {
+      transform: scale(1.1);
+      filter: drop-shadow(0 0 16px #ff002a);
+    }
+
+
+
+    /* Expanded section */
+    /* === Accordion Body Layout === */
+    .accordion-body {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.4s ease, opacity 0.4s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      /* centers horizontally */
+      text-align: center;
+      /* centers text */
+      padding: 0 10px;
+    }
+
+    /* Allow result accordion bodies to scroll */
+.result-accordion.active .accordion-body {
+  max-height: 75vh;              /* use viewport height instead of fixed px */
+  overflow-y: auto;              /* enable scrolling */
+  opacity: 1;
+  padding: 16px 10px;
+  scrollbar-width: thin;
+  scrollbar-color: #ff002a #000; /* red accent scrollbar */
+}
+
+
+    /* Inner text styling */
+    .accordion-body .player-meta,
+    .accordion-body .sync-summary {
+      width: 100%;
+      max-width: 440px;
+      /* keeps it narrow and neat */
+      text-align: left;
+      /* inner content still reads naturally */
+    }
+
+    .accordion-body h4,
+    .accordion-body .subhead {
+      text-align: center;
+    }
+
+
+
+    .player-meta p {
+      margin: 2px 0;
+      color: #ccc;
+      font-size: 0.8em;
+    }
+
+    .sync-summary {
+      border-top: 1px solid #ff002a55;
+      margin-top: 8px;
+      padding-top: 8px;
+    }
+
+    .sync-summary h4 {
+      color: #fff;
+      font-size: 0.9em;
+      margin-bottom: 6px;
+    }
+
+    .summary-block {
+      margin-top: 10px;
+    }
+
+    .summary-block .subhead {
+      color: #ff002a;
+      font-weight: bold;
+      text-transform: uppercase;
+      font-size: 0.75em;
+      margin-bottom: 4px;
+    }
+
+    .summary-block ul {
+      margin: 0;
+      padding-left: 15px;
+    }
+
+    .summary-block li {
+      margin-bottom: 3px;
+      list-style: disc;
+      color: #ddd;
+    }
+
+    /* ===============================
+   📱 DYNAMIC FONT SCALE (PLAYER NAME)
+   =============================== */
+    @media (max-width: 700px) {
+      .player-info strong {
+        /* Clamp: min, preferred, max — scales smoothly */
+        font-size: clamp(0.75em, 2.8vw, 0.95em);
+        max-width: 150px;
+        /* fine-tune depending on your layout */
+      }
+
+      .player-img {
+        width: 50px;
+        height: 50px;
+      }
+
+      .sync-score .value {
+        font-size: clamp(0.9em, 3vw, 1em);
+      }
+
+      .sync-score .label {
+        font-size: clamp(0.6em, 2.3vw, 0.7em);
+      }
+    }
+
+
+    /* Floating orb */
+    .floating-orb {
+      position: fixed;
+      bottom: 110px;
+      /* 👈 raised above bottom nav */
+      right: 25px;
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle, #ff002a 0%, #550010 80%);
+      border-radius: 50%;
+      box-shadow: 0 0 15px #ff002a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+      animation: pulse 2s infinite;
+      z-index: 10001;
+      /* 👈 ensures it floats over nav + modals */
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .floating-orb:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 0 25px #ff002a;
+    }
+
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 10px #ff002a;
+      }
+
+      50% {
+        box-shadow: 0 0 20px #ff002a;
+      }
+
+      100% {
+        box-shadow: 0 0 10px #ff002a;
+      }
+    }
+
+
+    /* 🔻 BOTTOM NAVIGATION */
+    /* 🔻 SCROLLABLE BOTTOM NAVIGATION BAR */
+    .bottom-nav {
+      position: fixed;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 500px;
+      /* 👈 matches your <main> max-width */
+      height: 70px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 1px solid #ff002a66;
+      border-radius: 40px;
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      z-index: 9999;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 0 20px rgba(255, 0, 42, 0.3);
+    }
+
+    /* ✅ Responsive: match 90% width on mobile */
+    @media (max-width: 700px) {
+      .bottom-nav {
+        width: 90%;
+        max-width: none;
+      }
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #ff002a;
+      font-size: 0.75em;
+      cursor: pointer;
+      transition: transform 0.2s, color 0.2s;
+    }
+
+    .nav-item img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 6px #ff002a);
+      margin-bottom: 4px;
+    }
+
+    .nav-item:hover {
+      transform: scale(1.1);
+      color: #fff;
+    }
+
+    .nav-item.active img {
+      filter: drop-shadow(0 0 12px #ff002a);
+    }
+
+    .nav-item span {
+      font-size: 0.7em;
+      color: #ff002a;
+      text-align: center;
+    }
+
+
+
+    /* Shared Modal Base */
+    /* Shared Modal Base */
+    /* Shared Modal Base */
+    /* ===============================
+   🔴 UNIVERSAL SYNC6 MODAL STYLES
+   =============================== */
+
+    /* --- Modal Shell --- */
+    /* ===============================
+   🔴 UNIVERSAL SYNC6 MODAL STYLES
+   =============================== */
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 75vw;
+      /* ✅ 75% of viewport width */
+      height: 75vh;
+      /* ✅ 75% of viewport height */
+      background: rgba(0, 0, 0, 0.95);
+      border: 2px solid #ff002a;
+      border-radius: 16px;
+      box-shadow: 0 0 30px rgba(255, 0, 42, 0.4);
+      display: flex;
+      flex-direction: column;
+      z-index: 10050;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      overflow: hidden;
+    }
+
+    /* 🔸 Open state */
+    .modal:not(.hidden) {
+      opacity: 1;
+      pointer-events: auto;
+      animation: modalFadeIn 0.25s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -46%) scale(0.96);
+      }
+
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    /* --- Inner Layout --- */
+    .modal-content {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* --- Header --- */
+    .modal-header {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      /* centers title horizontally */
+      align-items: center;
+      color: #ff002a;
+      font-size: 1.4em;
+      font-weight: 700;
+      padding: 10px 0;
+      /* reduces the tall padding */
+      border-bottom: 1px solid rgba(255, 0, 42, 0.4);
+      text-shadow: 0 0 8px rgba(255, 0, 42, 0.6);
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.3em;
+      color: #ff002a;
+      text-align: center;
+    }
+
+    /* move the close button to the far right corner */
+    .modal-header .close-btn {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.4em;
+    }
+
+    .modal-icon {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 6px rgba(255, 0, 42, 0.5));
+    }
+
+    /* --- Close Button --- */
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: #ff002a;
+      font-size: 1.6em;
+      cursor: pointer;
+      z-index: 1003;
+      position: relative;
+      transition: transform 0.2s ease, text-shadow 0.2s ease;
+    }
+
+    .close-btn:hover {
+      transform: scale(1.15);
+      text-shadow: 0 0 10px #ff002a;
+    }
+
+    /* --- Body --- */
+    .modal-body {
+      flex: 1;
+      padding: 25px;
+      color: #fff;
+      font-size: 0.95em;
+      line-height: 1.6em;
+      position: relative;
+      overflow-y: auto;
+    }
+
+    /* --- Locked Overlay (for upgrade-gated modals) --- */
+    .modal .locked-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(5px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border-radius: 16px;
+      text-align: center;
+      padding: 20px;
+      z-index: 1000;
+      /* below header and close button */
+    }
+
+    .modal .locked-overlay h3 {
+      color: #ff002a;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+      text-shadow: 0 0 8px rgba(255, 0, 42, 0.6);
+    }
+
+    .modal .locked-overlay p {
+      color: #ccc;
+      font-size: 0.9em;
+      width: 80%;
+      margin-bottom: 20px;
+    }
+
+    .modal .locked-overlay .upgrade-btn {
+      background: linear-gradient(90deg, #b30000, #ff002a);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      padding: 10px 22px;
+      font-size: 0.9em;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 0, 42, 0.4);
+      transition: 0.3s;
+    }
+
+    .modal .locked-overlay .upgrade-btn:hover {
+      box-shadow: 0 0 20px rgba(255, 0, 42, 0.6);
+    }
+
+    /* --- Table Layout (for Data Hub) --- */
+    .modal table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85em;
+      margin-top: 15px;
+    }
+
+    .modal th,
+    .modal td {
+      padding: 8px 5px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 0, 42, 0.2);
+    }
+
+    .modal th {
+      color: #ff002a;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .modal td {
+      color: #ddd;
+    }
+
+    /* --- Toggle Buttons (Data Hub) --- */
+    .modal .data-toggle {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .modal .data-toggle button {
+      flex: 1;
+      background: rgba(50, 50, 50, 0.7);
+      border: 1px solid rgba(255, 0, 42, 0.4);
+      border-radius: 8px;
+      color: #fff;
+      padding: 8px;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .modal .data-toggle button.active {
+      background: linear-gradient(90deg, #b30000, #ff002a);
+      box-shadow: 0 0 12px rgba(255, 0, 42, 0.4);
+    }
+
+    /* --- Responsive --- */
+    @media (max-width: 700px) {
+      .modal {
+        width: 90vw;
+        height: 80vh;
+      }
+    }
+
+
+    /* ===========================
+   👤 PROFILE MODAL STYLES
+   =========================== */
+    .profile-header {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .profile-pic {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 2px solid #ff002a;
+      box-shadow: 0 0 12px #ff002a;
+      transition: all 0.25s ease;
+    }
+
+    .profile-pic:hover {
+      box-shadow: 0 0 18px #ff002a, 0 0 28px rgba(255, 0, 42, 0.4);
+      transform: scale(1.03);
+    }
+
+    .profile-right {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      line-height: 1.3;
+    }
+
+    .profile-right h3.username {
+      font-size: 1.2em;
+      color: #fff;
+      margin-bottom: 4px;
+      text-shadow: 0 0 8px #ff002a;
+    }
+
+    .tier-badge {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.8em;
+      text-transform: uppercase;
+    }
+
+    .tier-basic {
+      background: rgba(255, 0, 42, 0.2);
+      border: 1px solid #ff002a;
+    }
+
+    .tier-plus {
+      background: rgba(0, 102, 255, 0.2);
+      border: 1px solid #00aaff;
+    }
+
+    .tier-elite {
+      background: rgba(255, 215, 0, 0.25);
+      border: 1px solid gold;
+      color: gold;
+    }
+
+    .profile-section {
+      margin-bottom: 20px;
+    }
+
+    .profile-section label {
+      display: block;
+      color: #ff002a;
+      font-weight: bold;
+      margin-bottom: 6px;
+      text-align: left;
+      width: 95%;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .profile-section textarea {
+      width: 95%;
+      max-width: 420px;
+      display: block;
+      margin: 0 auto 10px auto;
+      border-radius: 8px;
+      border: 1px solid #ff002a;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      padding: 10px;
+      resize: none;
+    }
+
+    .profile-section select {
+      width: 95%;
+      max-width: 420px;
+      display: block;
+      margin: 0 auto;
+      border-radius: 8px;
+      border: 1px solid #ff002a;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      padding: 10px;
+    }
+
+    .profile-stats {
+      border-top: 1px solid rgba(255, 0, 42, 0.3);
+      padding-top: 12px;
+      margin-top: 10px;
+      width: 95%;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .profile-stats p {
+      color: #ccc;
+      margin: 5px 0;
+      font-size: 0.95em;
+    }
+
+    .profile-stats span {
+      color: #ff002a;
+      font-weight: bold;
+    }
+
+    .profile-footer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 25px;
+    }
+
+    .profile-footer .btn-small {
+      width: 80%;
+      max-width: 300px;
+      text-align: center;
+      background: linear-gradient(90deg, #ff002a, #a30018);
+      border: none;
+      border-radius: 25px;
+      padding: 10px 0;
+      color: #fff;
+      font-weight: bold;
+      font-size: 0.9em;
+      box-shadow: 0 0 8px #ff002a55;
+      transition: all 0.3s ease;
+    }
+
+    .profile-footer .btn-small:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 14px #ff002a;
+    }
+
+    /* ===============================
+   🔧 RESPONSIVE TUNING
+   =============================== */
+    @media (max-width: 700px) {
+      .profile-pic {
+        width: 80px;
+        height: 80px;
+      }
+
+      .profile-right h3.username {
+        font-size: 1em;
+      }
+
+      .profile-section textarea,
+      .profile-section select {
+        width: 90%;
+      }
+
+      .profile-footer .btn-small {
+        width: 90%;
+      }
+    }
+
+
+
+
+    /* ==========================================================
+   🧠 SYNC6 INFO MODAL ACCORDION
+   (Distinct from player/result accordions)
+   ========================================================== */
+
+    .info-accordion {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    /* Each item */
+    .info-accordion-item {
+      background: rgba(15, 15, 15, 0.9);
+      border: 1px solid rgba(255, 0, 42, 0.35);
+      border-radius: 10px;
+      box-shadow: 0 0 12px rgba(255, 0, 42, 0.15);
+      overflow: hidden;
+      transition: all 0.35s ease;
+    }
+
+    .info-accordion-item:hover {
+      border-color: rgba(255, 0, 42, 0.6);
+      box-shadow: 0 0 20px rgba(255, 0, 42, 0.25);
+      transform: translateY(-1px);
+    }
+
+    /* Header (button) */
+    .info-accordion-header {
+      width: 100%;
+      text-align: left;
+      background: linear-gradient(90deg, rgba(255, 0, 42, 0.15), rgba(0, 0, 0, 0.7));
+      color: #ff002a;
+      font-weight: 700;
+      font-size: 1em;
+      padding: 14px 18px;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.4px;
+      text-shadow: 0 0 6px rgba(255, 0, 42, 0.3);
+      transition: background 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .info-accordion-header:hover {
+      background: linear-gradient(90deg, rgba(255, 0, 42, 0.3), rgba(0, 0, 0, 0.8));
+    }
+
+    /* Indicator arrow */
+    .info-accordion-header::after {
+      content: "▼";
+      font-size: 0.9em;
+      color: #ff002a;
+      margin-left: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .info-accordion-item.active .info-accordion-header::after {
+      transform: rotate(180deg);
+    }
+
+    /* Content */
+    .info-accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      background: rgba(10, 10, 10, 0.95);
+      color: #ddd;
+      padding: 0 18px;
+      border-top: 1px solid rgba(255, 0, 42, 0.3);
+      transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
+    }
+
+    .info-accordion-item.active .info-accordion-content {
+      max-height: 500px;
+      opacity: 1;
+      padding: 14px 18px 20px 18px;
+    }
+
+    /* Typography inside */
+    .info-accordion-content p {
+      margin: 10px 0;
+      font-size: 0.9em;
+      line-height: 1.6;
+      color: #ddd;
+    }
+
+    .info-accordion-content h4 {
+      margin-top: 12px;
+      color: #ff002a;
+      text-transform: uppercase;
+      font-size: 0.85em;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+    }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      .info-accordion-header {
+        font-size: 0.95em;
+        padding: 12px 14px;
+      }
+
+      .info-accordion-content p {
+        font-size: 0.85em;
+      }
+    }
+
+
+
+    /* Orb Content */
+    .orb-lineup {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      color: white;
+    }
+
+    .orb-player {
+      background: rgba(255, 0, 42, 0.1);
+      border: 1px solid #ff002a;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      padding: 10px 12px;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .orb-player h3 {
+      font-size: 1em;
+      margin: 0;
+    }
+
+    .remove-btn {
+      background: transparent;
+      border: none;
+      color: #ff002a;
+      font-size: 1.1em;
+      cursor: pointer;
+    }
+
+
+
+    @media (max-width: 500px) {
+      .player-img {
+        width: 48px;
+        height: 48px;
+      }
+
+      .sync-score .value {
+        font-size: 1em;
+      }
+
+      .add-btn img {
+        width: 24px;
+        height: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo"><img src="logo.png" alt="SYNC 6 Logo" /></div>
+    <button class="login-btn">Create / Login</button>
+  </header>
+  <div class="tagline">Build Your SYNC 6</div>
+
+
+  <!-- AI AI AI Chatbox -->
+  <div class="ai-chatbox">
+    <div class="input-wrapper">
+      <img src="mic_icon.png" class="mic-icon" alt="Voice Input">
+      <input type="text" id="aiInput" placeholder="AI - Decode With AI Head Coach" disabled>
+      <button id="findGamesBtn" class="btn-small">Find Today’s Games</button>
+    </div>
+  </div>
+
+
+  <main>
+    <!-- 🧮 Date Numerology -->
+    <div class="section" id="numerologySection">
+      <h2>Reveal Date Numerology</h2>
+      <input type="date" id="dateInput" />
+      <button class="btn" id="revealBtn">Reveal Date Numerology</button>
+
+      <!-- 6-box grid -->
+      <div class="numerology-grid" id="numerologyGrid" style="display:none;">
+        <div class="num-box"><span id="num72">--</span>Full Component</div>
+        <div class="num-box"><span id="num36">--</span>Partial Reduction</div>
+        <div class="num-box"><span id="num18">--</span>Digit Collapse</div>
+        <div class="num-box"><span id="num52">--</span>Simplified Comp.</div>
+        <div class="num-box"><span id="num16">--</span>Simplified Root</div>
+        <div class="num-box more" id="moreBox">➕ More Details</div>
+      </div>
+
+      <!-- Drawer breakdown -->
+      <div class="drawer" id="breakdownDrawer"></div>
+
+      <!-- Advanced accordion -->
+      <div class="accordion" id="advAccordion">Advanced Numerology</div>
+      <div class="panel" id="advPanel">
+        <p id="dayOfYear">Day of Year: --</p>
+        <p id="daysLeft">Days Left in Year: --</p>
+        <p id="masterFlag">Master Numbers: None</p>
+      </div>
+    </div>
+
+    <!-- ⚙️ Parameters -->
+    <div class="section">
+      <div class="parameters-header">
+        <h2>Parameters</h2>
+        <button class="btn-small" id="filterBtn">⚙️ Filters</button>
+      </div>
+
+      <select id="sportSelect">
+        <option value="">Select Sport</option>
+        <option value="NFL">NFL (Pro)</option>
+        <option value="NCAA">NCAA (College)</option>
+      </select>
+
+      <select id="gameSelect">
+        <option value="">Select Game</option>
+      </select>
+
+      <button class="btn" id="runGameBtn">SYNC IT UP</button>
+      <p style="
+    margin-top: 10px;
+    font-size: 0.8em;
+    color: #ff6666;
+    line-height: 1.4;
+    text-align: center;
+  ">
+        ⚠️ <strong>Note:</strong><br>
+        International games (London, Germany, etc.) may appear under the previous day’s slate due to UTC
+        scheduling from the data provider.
+      </p>
+    </div>
+
+
+
+    <!-- 🎛️ FILTER MODAL -->
+    <div id="filterModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Filters</h2>
+          <button class="close-btn" data-close="filterModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>Select filters to refine your Sync6 results.</p>
+
+          <div class="filter-section">
+            <h3>🏈 Player Attributes</h3>
+            <div class="filter-pills">
+              <button class="pill">QB</button>
+              <button class="pill">RB</button>
+              <button class="pill">WR</button>
+              <button class="pill">TE</button>
+              <button class="pill">Offense</button>
+              <button class="pill">Defense</button>
+              <button class="pill">Starter Only</button>
+            </div>
+          </div>
+
+          <div class="filter-section">
+            <h3>📅 Date & Numerology</h3>
+            <div class="filter-pills">
+              <button class="pill">Day Match</button>
+              <button class="pill">Month Match</button>
+              <button class="pill">Master # (11/22)</button>
+              <button class="pill">Strong Sync (80+)</button>
+              <button class="pill">Mirror</button>
+              <button class="pill">Prime</button>
+              <button class="pill">Repeating</button>
+            </div>
+          </div>
+
+          <div class="filter-section">
+            <h3>🔮 Pattern Filters</h3>
+            <div class="filter-pills">
+              <button class="pill">Exact Align</button>
+              <button class="pill">Top 10%</button>
+              <button class="pill">Hot Streaks</button>
+              <button class="pill">Team Clusters</button>
+            </div>
+          </div>
+
+          <div class="locked-overlay">
+            <h3>🔒 Advanced Filters</h3>
+            <p>Unlock advanced numerology, streak detection, and correlation mapping.</p>
+            <button class="upgrade-btn" onclick="showToast()">Upgrade Tier</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- 📊 Results -->
+    <!-- 📊 Results -->
+    <div class="section">
+      <div class="results-header">
+        <h2>RESULTS</h2>
+        <span class="sync-score-header">SYNC SCORE</span>
+      </div>
+      <div id="results"></div>
+    </div>
+  </main>
+
+
+  <!-- =============================== -->
+  <!-- 🔳 UNIFIED MODALS (SYNC6 STYLE) -->
+  <!-- =============================== -->
+
+
+  <!-- 🔻 BOTTOM NAVIGATION (CENTERED) -->
+  <nav class="bottom-nav">
+    <!-- 👤 PROFILE -->
+    <div class="nav-item" data-target="profile" title="Profile">
+      <img src="logo.png" alt="Profile" class="nav-icon" />
+      <span>Profile</span>
+    </div>
+
+    <!-- 🧠 DATA HUB -->
+    <div class="nav-item" data-target="dataHub" title="Data Hub">
+      <img src="logo.png" alt="Data Hub" class="nav-icon" />
+      <span>Data Hub</span>
+    </div>
+
+    <!-- 💬 FEED -->
+    <div class="nav-item" data-target="feed" title="Feed">
+      <img src="logo.png" alt="Feed" class="nav-icon" />
+      <span>Feed</span>
+    </div>
+
+    <!-- ℹ️ INFO -->
+    <div class="nav-item" data-target="info" title="Info">
+      <img src="logo.png" alt="Info" class="nav-icon" />
+      <span>Info</span>
+    </div>
+  </nav>
+
+
+  <!-- 👤 PROFILE MODAL -->
+  <!-- 👤 PROFILE MODAL -->
+  <div id="profileModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Profile</h2>
+        <button class="close-btn" data-close="profileModal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- 🔹 Profile Header -->
+        <div class="profile-header">
+          <div class="profile-left">
+            <img src="upload_icon.png" alt="Profile Picture" class="profile-pic"
+              onerror="this.src='https://via.placeholder.com/90x90/000000/ff002a?text=SYNC6'">
+          </div>
+
+          <div class="profile-right">
+            <h3 class="username">SyncUser99</h3>
+            <span class="tier-badge tier-basic">Basic Tier</span>
+            <p class="joined">Member since: Oct 2025</p>
+            <p class="sync-count">Active Syncs: 134</p>
+          </div>
+        </div>
+
+        <!-- 🔹 Personalization Section -->
+        <div class="profile-section">
+          <label>About Me / Tagline</label>
+          <textarea maxlength="200" placeholder="Numerology junkie + fantasy football wizard 🔮🏈"></textarea>
+          <button class="btn-small">Save Changes</button>
+        </div>
+
+        <div class="profile-section">
+          <label>Favorite Team</label>
+          <select>
+            <option>49ers</option>
+            <option>Chiefs</option>
+            <option>Cowboys</option>
+            <option>LSU</option>
+            <option>Alabama</option>
+          </select>
+        </div>
+
+        <!-- 🔹 Stats Overview -->
+        <div class="profile-stats">
+          <p>Most Synced Number: <span>7</span></p>
+          <p>Most Synced Player Type: <span>Quarterbacks</span></p>
+          <p>Top Numerology Root: <span>11 (Master)</span></p>
+          <p>Peak Sync Score: <span>98</span></p>
+          <p>Average Sync Strength: <span>74%</span></p>
+        </div>
+
+        <!-- 🔹 Footer -->
+        <div class="profile-footer">
+          <button class="btn-small">Manage Account</button>
+          <button class="btn-small">Logout</button>
+          <button class="btn-small upgrade-btn">Upgrade Tier</button>
+        </div>
+      </div> <!-- /.modal-body -->
+    </div> <!-- /.modal-content -->
+  </div> <!-- /#profileModal -->
+
+
+
+  <!-- 🧠 DATA HUB MODAL -->
+  <div id="dataHubModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          Data Hub
+        </h2>
+        <button class="close-btn" data-close="dataHubModal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          Access full Sync6 analytics — compare your stats with platform trends and community averages.
+        </p>
+
+        <!-- 🔻 Optional Toggle Buttons -->
+        <div class="data-toggle">
+          <button class="active">My Data</button>
+          <button>Global Stats</button>
+          <button>Favorites</button>
+        </div>
+
+        <!-- 🔻 Optional Example Table -->
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Team</th>
+              <th>Opponent</th>
+              <th>Sync Score</th>
+              <th>Result</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Oct 21, 2025</td>
+              <td>49ers</td>
+              <td>Chiefs</td>
+              <td>87</td>
+              <td>W 27–20</td>
+              <td>NFL</td>
+            </tr>
+            <tr>
+              <td>Oct 20, 2025</td>
+              <td>LSU</td>
+              <td>Alabama</td>
+              <td>73</td>
+              <td>L 14–28</td>
+              <td>NCAA</td>
+            </tr>
+            <tr>
+              <td>Oct 19, 2025</td>
+              <td>Cowboys</td>
+              <td>Giants</td>
+              <td>92</td>
+              <td>W 31–10</td>
+              <td>NFL</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- 🔒 Locked Overlay -->
+        <div class="locked-overlay">
+          <h3>🔒 Unlock the Data Hub</h3>
+          <p>
+            Access full Sync6 analytics — compare your stats with platform trends and community averages.
+          </p>
+          <button class="upgrade-btn" onclick="showToast()">Upgrade/Coming Soon</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 💬 FEED MODAL -->
+  <div id="feedModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          Feed
+        </h2>
+        <button class="close-btn" data-close="feedModal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          Community posts, streak updates, and trending Sync6 insights will appear here.
+        </p>
+
+        <div class="locked-overlay">
+          <h3>🔒 Unlock the Feed</h3>
+          <p>
+            Join the conversation — post updates, comment on Sync scores, and interact with other members.
+          </p>
+          <button class="upgrade-btn" onclick="showToast()">Upgrade for Access</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ℹ️ INFO MODAL -->
+  <!-- ℹ️ INFO MODAL -->
+  <div id="infoModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          Welcome to Sync6
+        </h2>
+        <button class="close-btn" data-close="infoModal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- 🔹 Intro -->
+        <p style="text-align:center; color:#ccc; font-size:0.95em; margin-bottom:20px;">
+          You’ve unlocked the <span style="color:#ff002a;font-weight:bold;">Basic Tier</span> of Sync6 — giving you
+          daily access to the numerology engine and pattern scoring system.<br>
+          Explore these common questions to master your Syncs and preview what’s coming next.
+        </p>
+
+        <!-- 🧠 10 Question Q&A -->
+        <div class="info-accordion">
+          <div class="info-accordion-item">
+            <button class="info-accordion-header">1. What does Sync6 actually measure?</button>
+            <div class="info-accordion-content">
+              <p>Sync6 decodes the relationship between player numbers, team names, and game dates using a six-point
+                numerology matrix. The result is a Sync Score — a numeric measure of energetic alignment on a given day.
+              </p>
+            </div>
+          </div>
+
+          <div class="info-accordion-item">
+            <button class="info-accordion-header">2. How are Sync Scores calculated?</button>
+            <div class="info-accordion-content">
+              <p>Each score blends date numerology, jersey digits, and name gematria with proprietary pattern weighting.
+                Higher percentages reflect deeper rhythmic resonance between the player and the day.</p>
+            </div>
+          </div>
+
+          <div class="info-accordion-item">
+            <button class="info-accordion-header">3. Why do jersey numbers matter?</button>
+            <div class="info-accordion-content">
+              <p>Numbers carry unique vibrational weights. A player’s jersey often mirrors key digits from the game
+                date, producing measurable energy overlaps that influence performance patterns.</p>
+            </div>
+          </div>
+
+          <div class="info-accordion-item">
+            <button class="info-accordion-header">4. What are Master Numbers?</button>
+            <div class="info-accordion-content">
+              <p>Master Numbers (11 &amp; 22) represent amplified alignment cycles — moments of rare significance in
+                numerology. When they appear, outcomes tend to carry added weight or symbolic resonance.</p>
+            </div>
+          </div>
+
+          <div class="info-accordion-item">
+            <button class="info-accordion-header">5. How does the date influence results?</button>
+            <div class="info-accordion-content">
+              <p>Each date has its own energetic fingerprint. Sync6 analyzes the month, day, and year breakdowns to
+                reveal how the daily vibration aligns with players’ number signatures.</p>
+            </div>
+          </div>
+
+          <div class="info-accordion-item">
+            <button class="info-accordion-header">6. What’s considered a “good” Sync Score?</button>
+            <div class="info-accordion-content">
+              <p>Scores above 70% signal strong synergy — where numbers, rhythm, and timing align. 80%+ is elite
+                alignment, often correlated with breakout performances or pivotal moments.</p>
+            </div>
+          </div>
+
+          <div class="info-accordion-item">
+            <button class="info-accordion-header">7. Why might scores fluctuate daily?</button>
+            <div class="info-accordion-content">
+              <p>Energy patterns shift with every date cycle. A player’s resonance may rise or fade depending on that
+                day’s numerological environment — that variability is the key to prediction power.</p>
+            </div>
+          </div>
+
+          <div class="info-accordion-item">
+            <button class="info-accordion-header">8. Can I compare teams or players?</button>
+            <div class="info-accordion-content">
+              <p>Yes — Sync6 lets you analyze both individual and team alignments. Compare Sync Scores across games to
+                spot hidden rhythm trends and collective momentum swings.</p>
+            </div>
+          </div>
+
+          <div class="info-accordion-item">
+            <button class="info-accordion-header">9. How should I use this data?</button>
+            <div class="info-accordion-content">
+              <p>Use Sync6 as a lens for timing. Combine it with stats or intuition — it doesn’t replace analysis; it
+                amplifies it by adding an unseen layer of numerical flow to your decision-making.</p>
+            </div>
+          </div>
+
+          <div class="info-accordion-item">
+            <button class="info-accordion-header">10. How does Sync6 evolve over time?</button>
+            <div class="info-accordion-content">
+              <p>Sync6 learns from every scan, expanding its pattern library and refining its algorithm. Future tiers
+                will unlock deeper datasets, AI integration, and cross-sport analysis.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 🚀 Coming Soon Section -->
+        <div style="
+        margin-top:28px;
+        padding:18px;
+        border:1px solid rgba(255,0,42,0.4);
+        border-radius:12px;
+        background:rgba(20,0,0,0.3);
+        box-shadow:0 0 12px rgba(255,0,42,0.25);
+      ">
+          <h3 style="color:#ff002a; text-transform:uppercase; letter-spacing:1px; text-align:center; margin-top:0;">🧭
+            Coming Soon to Sync6</h3>
+          <ul style="list-style:none; padding:0; margin:10px 0; line-height:1.7;">
+            <li>⚙️ <span style="color:#fff;">Advanced Filters</span> — Streak tracking, team clustering, and pattern
+              correlation mapping</li>
+            <li>📊 <span style="color:#fff;">Data Hub Expansion</span> — Cross-game analytics and user performance
+              dashboards</li>
+            <li>🔮 <span style="color:#fff;">AI Head Coach</span> — Voice-based decoding and predictive matchup insights
+            </li>
+            <li>🏀 <span style="color:#fff;">NBA + MLB Integration</span> — Multi-sport numerology coverage</li>
+            <li>🧠 <span style="color:#fff;">Community Feed</span> — Share Syncs, streaks, and discoveries with other
+              members</li>
+            <li>🪄 <span style="color:#fff;">Gematria Explorer</span> — Search name energies and team frequencies</li>
+            <li>🔔 <span style="color:#fff;">Smart Alerts</span> — Get notified when player or team Sync peaks</li>
+            <li>🏆 <span style="color:#fff;">XP / Loyalty System</span> — Earn badges and rewards for consistent
+              engagement</li>
+          </ul>
+          <p style="text-align:center; color:#aaa; font-size:0.85em;">
+            As a Basic Tier member, you’ll receive early access to several of these updates as they roll out.
+          </p>
+        </div>
+
+        <!-- 🔻 Footer Buttons -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:25px;">
+          <button class="btn-small">Manage Account</button>
+          <button class="btn-small" onclick="showToast('Feature in development — stay tuned!')">Update Plan/Coming
+            Soon</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+  <!-- 🪩 Floating Orb -->
+  <div class="floating-orb" id="syncOrb">0/6</div>
+
+  <!-- 🧠 ORB MODAL -->
+  <div id="orbModal" class="modal hidden">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h1>YOUR SYNC6 LINEUP</h1>
+        <button id="closeOrb" class="close-btn">✕</button>
+      </header>
+
+      <!-- Lineup Container -->
+      <div id="orbLineup" class="orb-lineup">
+        <!-- Players dynamically inserted here -->
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 🔔 Global Toast Element -->
+  <!-- 🔔 Global Toast Element -->
+  <!-- 🔔 Global Toast Element -->
+  <!-- 🔔 Global Toast Element -->
+  <!-- 🔔 JAVA JAVA JAVA -->
+
+  <div id="toast" class="toast hidden">Please upgrade for this feature.</div>
+
+
+  <script type="module">
+    // 🗓️ Auto-open calendar picker when focusing on date input
+    const dateInput = document.getElementById('dateInput');
+    dateInput.addEventListener('focus', () => {
+      // For Chrome/Edge/Safari – trigger the native picker
+      dateInput.showPicker?.();
+    });
+
+    // -------------------------
+    // 🧮 NUMEROLOGY CALCULATIONS
+    // -------------------------
+
+    function isMaster(num) { return num === 11 || num === 22; }
+    function sumDigits(str) { return str.split('').reduce((a, b) => a + Number(b), 0); }
+
+    document.getElementById('revealBtn').addEventListener('click', () => {
+      const dateVal = document.getElementById('dateInput').value;
+      if (!dateVal) return alert('Select a date first!');
+
+      // ✅ Parse the selected date manually to avoid UTC offset issues
+      const [year, month, dayNum] = dateVal.split('-').map(Number);
+      const d = new Date(year, month - 1, dayNum, 12, 0, 0, 0); // Local noon, avoids timezone shift
+
+      // 🔢 Extract date parts
+      const m = d.getMonth() + 1;
+      const day = d.getDate();
+      const y = d.getFullYear();
+      const yStr = y.toString();
+      const century = Number(yStr.slice(0, 2));
+      const lastTwo = Number(yStr.slice(2));
+
+      // 🧮 Numerology calculations
+      const fullComponent = m + day + century + lastTwo;
+      const partialReduction = m + day + Number(yStr[0]) + Number(yStr[1]) + Number(yStr[2]) + Number(yStr[3]);
+      const digitCollapse = sumDigits(`${m}${day}${y}`);
+      const simplifiedComponent = m + day + lastTwo;
+      const simplifiedRoot = sumDigits(`${m}${day}${lastTwo}`);
+
+      // 📅 Additional metrics
+      const dayOfYear = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 86400000);
+      const daysLeft = 365 - dayOfYear;
+
+      // 🧩 Update numerology boxes
+      const vals = [fullComponent, partialReduction, digitCollapse, simplifiedComponent, simplifiedRoot];
+      const ids = ['num72', 'num36', 'num18', 'num52', 'num16'];
+      vals.forEach((v, i) => {
+        const el = document.getElementById(ids[i]);
+        el.textContent = v;
+        const box = el.parentElement;
+        box.classList.remove('master');
+        if (isMaster(v)) box.classList.add('master');
+      });
+      document.getElementById('numerologyGrid').style.display = 'grid';
+
+      // 🧭 Advanced metrics display
+      document.getElementById('dayOfYear').innerText = `Day of Year: ${dayOfYear}`;
+      document.getElementById('daysLeft').innerText = `Days Left in Year: ${daysLeft}`;
+      document.getElementById('masterFlag').innerText =
+        vals.filter(isMaster).length > 0
+          ? `Master Numbers: ${vals.filter(isMaster).join(', ')}`
+          : 'Master Numbers: None';
+
+      // 📜 Drawer breakdown
+      const breakdown = `
+        <p>Full Component → (${m} + ${day} + ${century} + ${lastTwo} = ${fullComponent})</p>
+        <p>Partial Reduction → (${m} + ${day} + ${yStr.split('').join(' + ')} = ${partialReduction})</p>
+        <p>Digit Collapse → (${Array.from(`${m}${day}${y}`).join(' + ')} = ${digitCollapse})</p>
+        <p>Simplified Component → (${m} + ${day} + ${lastTwo} = ${simplifiedComponent})</p>
+        <p>Simplified Root → (${m.toString().split('').join(' + ')} + ${day.toString().split('').join(' + ')} + ${lastTwo.toString().split('').join(' + ')} = ${simplifiedRoot})</p>
+    `;
+      document.getElementById('breakdownDrawer').innerHTML = breakdown;
+
+      // 🧾 Debug (optional)
+      console.log("Local date selected:", d.toString());
+    });
+
+    // -------------------------
+    // 🔻 DRAWER & ACCORDION TOGGLES (Reattach-safe)
+    // -------------------------
+    function initToggles() {
+      const moreBox = document.getElementById('moreBox');
+      const drawer = document.getElementById('breakdownDrawer');
+      const advAcc = document.getElementById('advAccordion');
+      const advPanel = document.getElementById('advPanel');
+
+      if (!moreBox || !drawer || !advAcc || !advPanel) return;
+
+      // 🪶 More Details Drawer
+      let drawerOpen = false;
+      moreBox.onclick = () => {
+        drawerOpen = !drawerOpen;
+        drawer.classList.toggle('open', drawerOpen);
+        moreBox.textContent = drawerOpen ? '✖ Close Details' : '➕ More Details';
+      };
+
+      // 📘 Advanced Numerology Accordion
+      advAcc.onclick = () => {
+        const active = advAcc.classList.toggle('active');
+        advPanel.classList.toggle('open', active);
+      };
+    }
+
+    // Run once at load
+    initToggles();
+
+    // Optional: re-init after revealBtn click (if grid rebuilt dynamically)
+    document.getElementById('revealBtn').addEventListener('click', () => {
+      setTimeout(initToggles, 100); // ensures they stay attached
+    });
+
+
+
+
+
+
+    // -------------------------
+    // 🔻 Parameters Section APIS
+    // 
+    // 🏈 Fetch Games by League and Date
+    /********************************************
+     * 🏈 Fetch Games + Auto-Analyze Workflow
+     ********************************************/
+
+    // Imports (make sure scoringEngine.js is in the same folder)
+    import { scorePlayers } from "./scoringEngine.js";
+
+    // === DOM Elements ===
+    const sportSelect = document.getElementById("sportSelect");
+    const gameSelect = document.getElementById("gameSelect");
+    const runBtn = document.getElementById("runGameBtn");
+    const resultsContainer = document.getElementById("results");
+
+    let filteredGamesGlobal = []; // 🧭 store filtered games globally for re-use
+
+
+    // === Fetch games via proxy ===
+    // === Fetch games via proxy ===
+    // === Fetch games via proxy ===
+    async function getFootballGames(sport, dateVal) {
+      const pacificZone = "America/Los_Angeles";
+
+      const leagueId = sport === "NCAA" ? 2 : 1;
+
+      // 🧭 Fetch one day before and after so UTC rollovers (late games) are included
+      const prevDate = new Date(dateVal);
+      prevDate.setDate(prevDate.getDate() - 1);
+      const nextDate = new Date(dateVal);
+      nextDate.setDate(nextDate.getDate() + 1);
+
+const url = `/.netlify/functions/fetchGames?league=${leagueId}&season=2025&from=${prevDate.toISOString().split('T')[0]}&to=${nextDate.toISOString().split('T')[0]}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        console.log(`✅ ${sport} games found (raw):`, data.response?.length || 0);
+        console.log("🧠 Sample game object:", data.response?.[0]);
+
+        // 🧹 Include games that fall within the selected Pacific day (midnight–midnight PT)
+        const selectedLocal = new Date(dateVal + "T00:00:00"); // midnight of selected local day
+
+        // Compute UTC boundaries for the selected Pacific calendar day
+        const startOfDayUTC = new Date(
+          selectedLocal.toLocaleString("en-US", { timeZone: "UTC" })
+        );
+        // Add +3h buffer (27 hours total) to safely include late PT games
+        const endOfDayUTC = new Date(startOfDayUTC.getTime() + 27 * 60 * 60 * 1000);
+
+        // Filter all games whose UTC timestamps fall inside that window
+        const filteredGames = (data.response || []).filter(game => {
+          const ts = game?.game?.date?.timestamp;
+          if (!ts) return false;
+
+          const gameUTC = new Date(ts * 1000);
+          return gameUTC >= startOfDayUTC && gameUTC < endOfDayUTC;
+        });
+
+        // 🕵️ Debug confirmation — print Pacific start times for all filtered games
+        console.log(`📅 Filtered Games (${filteredGames.length}):`);
+        filteredGames.forEach(g => {
+          const ts = g?.game?.date?.timestamp;
+          if (!ts) return;
+          const pacificTime = new Date(new Date(ts * 1000).toLocaleString("en-US", { timeZone: pacificZone }));
+          console.log(`🏈 ${g.teams.away.name} @ ${g.teams.home.name} → ${pacificTime.toLocaleString("en-US", { timeZone: pacificZone })}`);
+        });
+
+        // 🎮 Save and populate dropdown with filtered results
+        filteredGamesGlobal = filteredGames; // ✅ store filtered games for later use
+        populateGameDropdown(filteredGames);
+
+
+      } catch (err) {
+        console.error("❌ Error fetching games:", err);
+      }
+    }
+
+
+
+
+
+    // === Populate dropdown ===
+    function populateGameDropdown(games) {
+      gameSelect.innerHTML = `
+        <option value=''>Select Game</option>
+        <option value='ALL'>All Games (Full Day Sync)</option>
+    `;
+
+      if (!games || games.length === 0) {
+        gameSelect.innerHTML += "<option>No games found for this date</option>";
+        return;
+      }
+
+      games.forEach((g, i) => {
+        const home = g.teams?.home?.name ?? "Home";
+        const away = g.teams?.away?.name ?? "Away";
+        const week = g.game?.week ?? g.week ?? null;
+        const weekText = typeof week === "string" ? ` – ${week}` : week?.name ? ` – ${week.name}` : "";
+
+        const opt = document.createElement("option");
+        opt.textContent = `${away} @ ${home}${weekText}`;
+        opt.value = i;
+        gameSelect.appendChild(opt);
+      });
+    }
+
+
+
+    // === Trigger fetch when sport or date changes ===
+    sportSelect.addEventListener("change", () => {
+      const sport = sportSelect.value;
+      const dateVal = dateInput.value;
+      if (sport && dateVal) getFootballGames(sport, dateVal);
+    });
+
+    dateInput.addEventListener("change", () => {
+      const sport = sportSelect.value;
+      const dateVal = dateInput.value;
+      if (sport && dateVal) getFootballGames(sport, dateVal);
+    });
+
+    /********************************************
+     * 🚀 STEP 3: Run Game Analysis + Display
+     ********************************************/
+
+    // 🧩 Helper: Collect date numerologies + ensure actual day is included
+    function getDateNumerology() {
+      const ids = ['num72', 'num36', 'num18', 'num52', 'num16'];
+      const nums = ids
+        .map(id => Number(document.getElementById(id).textContent))
+        .filter(n => !isNaN(n));
+
+      // Always include the actual calendar day
+      const dateVal = document.getElementById("dateInput").value;
+      if (dateVal) {
+        const [, , day] = dateVal.split("-").map(Number);
+        if (!nums.includes(day)) nums.push(day);
+      }
+
+      return nums;
+    }
+
+
+    function getGematriaValue(str) {
+      const table = {
+        a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9,
+        j: 1, k: 2, l: 3, m: 4, n: 5, o: 6, p: 7, q: 8, r: 9,
+        s: 1, t: 2, u: 3, v: 4, w: 5, x: 6, y: 7, z: 8
+      };
+      return str
+        .toLowerCase()
+        .replace(/[^a-z]/g, "")
+        .split("")
+        .reduce((sum, ch) => sum + (table[ch] || 0), 0);
+    }
+
+
+    runBtn.addEventListener("click", async () => {
+      const sport = sportSelect.value;
+      const dateVal = dateInput.value;
+      const gameIndex = gameSelect.value;
+
+      if (!sport || !dateVal) {
+        alert("Please select sport and date first.");
+        return;
+      }
+
+
+      const dateNums = getDateNumerology();
+
+      // ✅ Use previously filtered games (from dropdown)
+      const games = filteredGamesGlobal;
+      if (!games || !games.length) {
+        alert("No games found for this date.");
+        return;
+      }
+
+
+      // 🧩 SYNC ALL GAMES if 'ALL' is selected
+      // 🧩 SYNC ALL GAMES if 'ALL' is selected
+      // ============================================================
+// 🧩 SYNC ALL GAMES / SINGLE GAME HANDLER (Unified Logic)
+// ============================================================
+// ============================================================
+// 🧩 UNIFIED SYNC SIX HANDLER — ALL GAMES + SINGLE GAME
+// ============================================================
+
+// 🔹 Shared helpers
+async function fetchRoster(teamId) {
+  if (!teamId) return [];
+  try {
+    const res = await fetch(`/.netlify/functions/fetchRoster?teamId=${teamId}&season=2025`)
+    const data = await res.json();
+    return data.response || [];
+  } catch {
+    return [];
+  }
+}
+
+// 🔹 Shared roster builder
+async function getRosterForGame(gameData) {
+  if (!gameData?.teams) return [];
+
+  const [homeRoster, awayRoster] = await Promise.all([
+    fetchRoster(gameData.teams?.home?.id),
+    fetchRoster(gameData.teams?.away?.id),
+  ]);
+
+  const timestamp = gameData?.game?.date?.timestamp;
+  const gameDate = timestamp
+    ? new Date(timestamp * 1000).toLocaleDateString("en-US", { timeZone: "America/Los_Angeles" })
+    : "TBD";
+  const gameTime = timestamp
+    ? new Date(timestamp * 1000).toLocaleTimeString("en-US", {
+        timeZone: "America/Los_Angeles",
+        hour: "numeric",
+        minute: "2-digit",
+      })
+    : "TBD";
+  const venue = gameData?.game?.venue?.name || "—";
+  const homeScore = gameData?.scores?.home?.total ?? null;
+  const awayScore = gameData?.scores?.away?.total ?? null;
+
+  const combined = [...homeRoster, ...awayRoster]
+    .filter(p => {
+      const img = p.image || "";
+      const id = Number(p.id) || 0;
+      if (id >= 6500) return false;
+      if (!img.startsWith("http")) return false;
+      return (
+        !img.toLowerCase().includes("placeholder") &&
+        !img.toLowerCase().includes("default") &&
+        !img.toLowerCase().includes("noimage") &&
+        !img.toLowerCase().includes("image_not_available")
+      );
+    })
+    .map(p => {
+      const isHomeTeam = homeRoster.some(hr => hr.id === p.id);
+      const teamName = isHomeTeam
+        ? gameData.teams?.home?.name
+        : gameData.teams?.away?.name;
+      const opponentName = isHomeTeam
+        ? gameData.teams?.away?.name
+        : gameData.teams?.home?.name;
+
+      let result = "TBD";
+      if (homeScore !== null && awayScore !== null) {
+        const didWin = isHomeTeam
+          ? homeScore > awayScore
+          : awayScore > homeScore;
+        result = didWin ? "W" : "L";
+      }
+
+      return {
+        name: p.name || "Unknown Player",
+        jersey: Number(p.number) || 0,
+        image: p.image,
+        position: p.position?.abbreviation || p.position?.name || "—",
+        dob: p.birth?.date || "—",
+        teamName,
+        opponentName,
+        date: gameDate,
+        time: gameTime,
+        venue,
+        result,
+        playerGematria: getGematriaValue(p.name),
+        teamGematria: getGematriaValue(teamName || ""),
+        oppGematria: getGematriaValue(opponentName || "")
+      };
+    });
+
+  console.log(`🧮 ${combined.length} valid players from ${gameData.teams?.home?.name} & ${gameData.teams?.away?.name}`);
+  return combined;
+}
+
+// ============================================================
+// 🧩 MAIN EXECUTION BLOCK
+// ============================================================
+
+let allPlayers = [];
+
+if (gameIndex === "ALL") {
+  console.log("🔁 Running full-day Sync Six for all games...");
+
+  for (const g of games) {
+    const roster = await getRosterForGame(g);
+    allPlayers.push(...roster);
+  }
+
+  const firstGame = games[0];
+  console.log(`🧩 Combined ${allPlayers.length} total players across ${games.length} games`);
+
+  const results = scorePlayers(
+    allPlayers,
+    {
+      date: { start: firstGame?.game?.date?.start },
+      teams: firstGame?.teams,
+      venue: firstGame?.game?.venue
+    },
+    dateNums
+  );
+
+  console.log("🧠 Engine Results:", results);
+  renderResults(results);
+  return;
+}
+
+// 🎯 SINGLE GAME MODE
+const gameData = games[gameIndex];
+const players = await getRosterForGame(gameData);
+
+console.log(`🎯 Running single-game Sync Six for ${gameData.teams?.home?.name} vs ${gameData.teams?.away?.name}`);
+console.log("🧩 Sample Player:", players[0]);
+
+const results = scorePlayers(players, gameData, dateNums);
+console.log("🧠 Engine Results:", results);
+renderResults(results);
+}); // 👈 closes runBtn.addEventListener
+
+
+
+    // === Render function ===
+    function renderResults(results) {
+  const container = document.getElementById("results");
+  container.innerHTML = "";
+
+window.lastResults = results;
+console.table(results.map(r => ({
+  name: r.name,
+  team: r.teamName,
+  opponent: r.opponentName,
+  date: r.date,
+  position: r.position,
+  dob: r.dob,
+  venue: r.venue,
+  score: r.score
+})));
+
+
+
+  if (!results || results.length === 0) {
+    container.innerHTML = `<p style="color:#aaa;">No strong player alignments found (below 50%)</p>`;
+    return;
+  }
+
+  results.forEach((player) => {
+    // ✅ score color tier
+    let scoreClass = "";
+    if (player.score >= 90) scoreClass = "score-green";
+    else if (player.score >= 70) scoreClass = "score-gold";
+    else if (player.score >= 50) scoreClass = "score-blue";
+    else scoreClass = "score-gray";
+
+    // ✅ Build accordion shell
+    const accordion = document.createElement("div");
+    accordion.classList.add("result-accordion");
+
+    // ===========================
+    // 🔻 HEADER
+    // ===========================
+    const header = document.createElement("div");
+    header.classList.add("accordion-header");
+    header.innerHTML = `
+      <div class="player-left">
+        <img src="${player.image || 'placeholder.png'}" alt="${player.name}" class="player-img">
+        <div class="player-info">
+          <strong>${player.name}</strong>
+<span>#${player.jersey} ${player.teamName || '—'} vs ${player.opponentName || '—'}</span>
+        </div>
+      </div>
+      <div class="player-right">
+        <div class="sync-score">
+          <span class="label">SYNC</span>
+          <span class="value ${scoreClass}">${player.score ?? '--'}%</span>
+        </div>
+        <button class="add-btn" data-name="${player.name}" data-jersey="${player.jersey}">
+          <img src="plus_button.png" alt="Add to lineup">
+        </button>
+      </div>
+    `;
+
+    // --- ADD TO ORB LOGIC ---
+    const addButton = header.querySelector(".add-btn");
+    addButton.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const playerData = {
+        name: player.name,
+        syncScore: player.score,
+        jersey: player.jersey,
+        team: player.teamName,
+        opponent: player.opponentName,
+        image: player.image,
+      };
+      addToOrb(playerData);
+    });
+
+    // ===========================
+    // 🔻 BODY (expanded section)
+    // ===========================
+    const body = document.createElement("div");
+    body.classList.add("accordion-body");
+
+    // 🧩 Simple helper match flags
+    const jerseyMatch = player.jerseyMatch ? "✅ Yes" : "✖ No";
+    const dobMatch = player.dobMatch ? "✅ Yes" : "✖ No";
+
+    body.innerHTML = `
+      <!-- 🏈 GAME META -->
+      <div class="player-meta">
+        <p><strong>GAME:</strong> ${player.teamName || "—"} @ ${player.opponentName || "—"}</p>
+        <p><strong>Date:</strong> ${player.date || "TBD"} | <strong>Time:</strong> ${player.time || "TBD PST"}</p>
+        <p><strong>Venue:</strong> ${player.venue || "—"}</p>
+      </div>
+
+
+      <!-- 🔮 SYNC SUMMARY -->
+      <div class="sync-summary">
+        <h4>SYNC SUMMARY</h4>
+
+        <div class="summary-block">
+          <p class="subhead">OVERALL ALIGNMENTS</p>
+          <ul>
+            <li>Overall Sync ${player.score ?? "--"}% (${player.methodType || "Gematria"})</li>
+            <li>Sync Category Match ${player.categoryHit || "—"}</li>
+            <li>Outcome Type ${player.result || "—"}</li>
+          </ul>
+        </div>
+
+        <div class="summary-block">
+          <p class="subhead">SYNC BREAKDOWN</p>
+          <ul>
+            <li>Jersey ↔ Date Match ${jerseyMatch}</li>
+            <li>DOB ↔ Game Date ${dobMatch}</li>
+            <li>Player Gematria ${player.playerGematria ?? "--"} ↔ Date Numerology Match</li>
+            <li>Team Gematria ${player.teamGematria ?? "--"} | Opponent Gematria ${player.oppGematria ?? "--"}</li>
+          </ul>
+        </div>
+
+        <div class="summary-block">
+          <p class="subhead">OTHER FACTORS</p>
+          <ul>
+            <li>Prime Match ${player.primeMatch ? "True" : "False"}</li>
+            <li>Active Energy Phase ${player.energyPhase ? "Yes" : "No"}</li>
+            <li>Moon Phase: ${player.moonPhase || "N/A"}</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 📊 RAW PARAMETERS -->
+      <div class="summary-block">
+        <p class="subhead">RAW PARAMETERS</p>
+        <ul>
+          <li>Full Numerology: ${player.fullComponent ?? "--"} | Reduced: ${player.partialReduction ?? "--"} | Life Path: ${player.lifePath ?? "--"} | Simplified: ${player.simplifiedComp ?? "--"} | Root: ${player.simplifiedRoot ?? "--"}</li>
+          <li>Player Gematria: ${player.playerGematria ?? "--"}</li>
+          <li>Team Gematria: ${player.teamGematria ?? "--"} | Opponent: ${player.oppGematria ?? "--"}</li>
+          <li>Jersey #: ${player.jersey}</li>
+        </ul>
+      </div>
+
+
+
+      <!-- 🧩 PATTERN INSIGHTS -->
+      <div class="summary-block">
+        <p class="subhead">PATTERN INSIGHTS</p>
+        <ul>
+          <li>${player.pattern1 || "—"}</li>
+          <li>${player.pattern2 || "—"}</li>
+          <li>${player.pattern3 || "—"}</li>
+        </ul>
+      </div>
+
+      <!-- 📝 NOTES -->
+      <div class="summary-block">
+        <p class="subhead">NOTES</p>
+        <ul>
+          <li>${player.manualNotes || "—"}</li>
+        </ul>
+      </div>
+    `;
+
+    // --- TOGGLE ACCORDION ---
+    header.addEventListener("click", (e) => {
+      if (e.target.closest(".add-btn")) return;
+      document.querySelectorAll(".result-accordion.active").forEach((acc) => {
+        if (acc !== accordion) acc.classList.remove("active");
+      });
+      accordion.classList.toggle("active");
+    });
+
+    accordion.appendChild(header);
+    accordion.appendChild(body);
+    container.appendChild(accordion);
+  });
+}
+
+
+
+
+
+    // ==============================
+    // 🔔 UNIVERSAL TOAST FUNCTION
+    // ==============================
+    window.showToast = function (message = "Please upgrade for this feature.") {
+      let toast = document.getElementById("toast");
+
+      // If no toast element exists, create one dynamically
+      if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "toast";
+        toast.className = "toast";
+        document.body.appendChild(toast);
+      }
+
+      toast.textContent = message;
+      clearTimeout(window._toastTimer);
+      toast.classList.add("show");
+
+      window._toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    };
+
+
+    // 🎛️ FILTER MODAL LOGIC
+    // 🎛️ FILTER MODAL LOGIC
+    // 🎛️ FILTER MODAL LOGIC
+    const filterBtn = document.getElementById("filterBtn");
+    const filterModal = document.getElementById("filterModal");
+
+    filterBtn.addEventListener("click", () => {
+      document.querySelectorAll(".modal").forEach(m => m.classList.add("hidden"));
+      filterModal.classList.remove("hidden");
+    });
+
+    // Toggle active pills
+    document.addEventListener("click", (e) => {
+      if (e.target.classList.contains("pill")) {
+        e.target.classList.toggle("active");
+      }
+    });
+
+
+
+    // -------------------------
+    // 🪩 FLOATING ORB (SYNC 6 COUNT)
+    // -------------------------
+    // ===============================
+    // 🧠 SYNC6 ORB MODAL CONTROLLER
+    // ===============================
+    const orbModal = document.getElementById("orbModal");
+    const orbLineupContainer = document.getElementById("orbLineup");
+    const closeOrbBtn = document.getElementById("closeOrb");
+    const syncOrb = document.getElementById("syncOrb");
+
+    // 🧩 Active lineup array
+    let orbLineup = [];
+
+    // -----------------------------------
+    // 🔘 Open / Close Modal
+    // -----------------------------------
+    function openOrb() {
+      orbModal.classList.remove("hidden");
+      renderOrbLineup();
+    }
+
+    function closeOrb() {
+      orbModal.classList.add("hidden");
+    }
+
+    closeOrbBtn.addEventListener("click", closeOrb);
+    syncOrb.addEventListener("click", openOrb);
+
+    // -----------------------------------
+    // 🧱 Render Lineup in Modal
+    // -----------------------------------
+    function renderOrbLineup() {
+      orbLineupContainer.innerHTML = "";
+
+      if (orbLineup.length === 0) {
+        orbLineupContainer.innerHTML = `
+      <p style="text-align:center;color:#aaa;">No players added yet.</p>
+    `;
+        updateOrbCount();
+        return;
+      }
+
+      orbLineup.forEach((player, index) => {
+        const card = document.createElement("div");
+        card.classList.add("orb-player");
+
+        card.innerHTML = `
+      <h3>${player.name} 
+        <span style="color:#ff002a;">${player.syncScore || "--"}%</span>
+      </h3>
+      <button class="remove-btn" data-index="${index}">✕</button>
+    `;
+
+        orbLineupContainer.appendChild(card);
+      });
+
+      // Attach remove events
+      orbLineupContainer.querySelectorAll(".remove-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          const index = Number(e.target.dataset.index);
+          removeFromOrb(index);
+        });
+      });
+
+      updateOrbCount();
+    }
+
+    // -----------------------------------
+    // ➕ Add Player to Orb
+    // -----------------------------------
+    function addToOrb(playerData) {
+      if (orbLineup.length >= 6) {
+        alert("Your orb is full! (6 players max)");
+        return;
+      }
+
+      // Avoid duplicates by name
+      const exists = orbLineup.some(p => p.name === playerData.name);
+      if (exists) return;
+
+      orbLineup.push(playerData);
+      updateOrbCount();
+      renderOrbLineup();
+    }
+
+    // -----------------------------------
+    // 🗑️ Remove from Lineup
+    // -----------------------------------
+    function removeFromOrb(index) {
+      orbLineup.splice(index, 1);
+      renderOrbLineup();
+    }
+
+    // -----------------------------------
+    // 💡 Orb Counter + Glow Effect
+    // -----------------------------------
+    function updateOrbCount() {
+      syncOrb.textContent = `${orbLineup.length}/6`;
+
+      const glow = Math.min(orbLineup.length / 6, 1);
+      syncOrb.style.boxShadow = `0 0 ${15 + glow * 25}px rgba(255, 0, 42, ${0.4 + glow * 0.4})`;
+    }
+
+    // -----------------------------------
+    // 🧭 Init
+    // -----------------------------------
+    updateOrbCount();
+
+
+
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // ===============================
+      // 🔻 BOTTOM NAV → MODALS
+      // ===============================
+      const navItems = document.querySelectorAll(".nav-item");
+      const modals = {
+        profile: document.getElementById("profileModal"),
+        dataHub: document.getElementById("dataHubModal"),
+        feed: document.getElementById("feedModal"),
+        info: document.getElementById("infoModal"),
+      };
+
+      // 🟢 Open modal when icon clicked
+      navItems.forEach((item) => {
+        item.addEventListener("click", () => {
+          const target = item.dataset.target;
+          document.querySelectorAll(".modal").forEach((m) => m.classList.add("hidden"));
+          if (modals[target]) modals[target].classList.remove("hidden");
+        });
+      });
+
+      // 🔴 Close modal when ❌ clicked
+      document.querySelectorAll(".close-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const id = e.target.dataset.close;
+          const modal = document.getElementById(id);
+          if (modal) modal.classList.add("hidden");
+          else e.target.closest(".modal")?.classList.add("hidden");
+        });
+      });
+
+      // ===============================
+      // 🎙️ AI CHAT → TOAST TRIGGERS
+      // ===============================
+      const aiInput = document.getElementById("aiInput");
+      const micIcon = document.querySelector(".mic-icon");
+      const findGamesBtn = document.getElementById("findGamesBtn");
+
+      if (aiInput) aiInput.addEventListener("click", () => showToast());
+      if (micIcon) micIcon.addEventListener("click", () => showToast("Voice input coming soon!"));
+      if (findGamesBtn) findGamesBtn.addEventListener("click", () => showToast());
+
+      // ===============================
+      // 🧠 INFO MODAL → ACCORDION LOGIC
+      // ===============================
+      const infoAccordions = document.querySelectorAll(".info-accordion-header");
+
+      infoAccordions.forEach((header) => {
+        header.addEventListener("click", () => {
+          const item = header.closest(".info-accordion-item");
+
+          // Close other open items first
+          document.querySelectorAll(".info-accordion-item").forEach((i) => {
+            if (i !== item) i.classList.remove("active");
+          });
+
+          // Toggle current one
+          item.classList.toggle("active");
+
+          // Optional: smooth scroll to keep opened content visible
+          if (item.classList.contains("active")) {
+            item.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          }
+        });
+      });
+    });
+
+
+
+
+  </script>
+</body>
+
+</html>
